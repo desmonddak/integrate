@@ -90,7 +90,11 @@ jobs:
           at: /work/workspace
       - run: pwd; ls -l
       - store_test_results:
-        path: src/<< parameters.dir >>/test-reports
+          path: src/<< parameters.dir >>/test-reports
+      - store_artifacts:
+          path: src/<< parameters.dir >>/test-reports
+      - store_artifacts:
+          path: src/<< parameters.dir >>/coverage-reports
 
 
 workflows:
