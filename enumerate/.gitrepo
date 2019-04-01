@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/desmonddak/iso-enumerate.git
+	branch = master
+	commit = 662ec7ca8455a61b4c311ead1f56ea36f8cebddd
+	parent = d5a0c3e21b7ecb568d07df848b958f16f4c8bf38
+	method = merge
+	cmdver = 0.4.0
