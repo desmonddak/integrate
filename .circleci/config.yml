@@ -30,6 +30,7 @@ jobs:
       - attach_workspace:
           at: /work/workspace
       - checkout
+      - run: git subrepo pull --all
       - persist_to_workspace:
           root: /work/workspace/
           # Must be relative path from root
