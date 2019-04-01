@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/desmonddak/iso-tally.git
+	branch = master
+	commit = 3f0fab7f9328857ef2871e3b3e3a7dbf23640302
+	parent = 9509c3198349a30a61426126cb5f5f6a98d24279
+	method = merge
+	cmdver = 0.4.0
