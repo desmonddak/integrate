@@ -1,0 +1,132 @@
+# Note that the following stanza uses CircleCI 2.1 to make use of a Reusable
+# Executor This allows defining a docker image to reuse across jobs.  visit
+# https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors to
+# learn more.
+
+version: 2.1
+
+executors:
+  source-executor:
+    docker:
+      - image: desmonddak/new-git:latest
+        environment:
+          BASH_ENV: "/root/.bashrc"
+    working_directory: /work/workspace/src
+  py_coverage:
+    docker:
+      - image: desmonddak/py-general:latest
+        environment:
+          BASH_ENV: "/root/.bashrc"
+    working_directory: /work/workspace/src
+  other-executor:
+    docker:
+      - image: desmonddak/new-git:latest
+    working_directory: /tmp
+
+jobs:
+  src_engine:
+    executor: source-executor
+    steps:
+      - attach_workspace:
+          at: /work/workspace
+      - checkout
+      - persist_to_workspace:
+          root: /work/workspace/
+          # Must be relative path from root
+          paths:
+            - src
+  coverage_engine:
+    executor: py_coverage
+    parameters:
+      dir:
+        type: string
+        default: ""
+      dependencies:
+        type: string
+        default: ""
+      source:
+        type: string
+        default: ""
+    working_directory: /work/workspace/src/<< parameters.dir >>
+    steps:
+      - when:
+         condition: << parameters.dir >>
+         steps:
+           - run: "echo Got a parameter << parameters.dir >>"
+      - run: printenv
+      - attach_workspace:
+          at: /work/workspace
+      - run: for fn in << parameters.dependencies >>; do cd ../$fn && pip install .; done
+      - run: pip install .
+      - run: coverage run --source << parameters.source >> setup.py test
+      - run: coverage html
+      - run: coverage xml
+      - run: coverage-badge -o htmlcov/coverage.svg
+      - run: mkdir -p test-reports && cp junit.xml test-reports
+      - run: mkdir -p coverage-reports && cp -r coverage.xml htmlcov coverage-reports 
+            
+      # Persist the specified paths (workspace/echo-output) into the workspace for
+      # use in downstream job.
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory. This
+          # is a directory on the container which is taken to be the root directory
+          # of the workspace.
+          root: /work/workspace/src/<< parameters.dir >> 
+          # Must be relative path from root
+          paths:
+            - test-reports
+            - coverage-reports
+
+  check_results:
+    executor: other-executor
+    parameters:
+      dir:
+        type: string
+        default: ""
+    steps:
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: /tmp/workspace
+
+
+workflows:
+  version: 2.1
+
+  load_run_check:
+    jobs:
+      - src_engine
+      - coverage_engine:
+          requires:
+            - src_engine
+          name:  tally
+          dir:  "tally"
+          source: "tally,tests"
+      - coverage_engine:
+          requires:
+            - src_engine
+          name:  sgi
+          dir:  "sgi"
+          dependencies:  tally
+          source: "sgi,tests"
+      - coverage_engine:
+          requires:
+            - src_engine
+          name:  enumerate
+          dir:  "enumerate"
+          dependencies:  tally
+          source: "enumerate,tests"
+      - check_results:
+          requires:
+            - tally
+          name:  check_tally
+          dir:  "tally"
+      - check_results:
+          requires:
+            - sgi
+          name:  check_sgi
+          dir:  "sgi"
+      - check_results:
+          requires:
+            - enumerate
+          name:  check_enumerate
+          dir:  "enumerate"
