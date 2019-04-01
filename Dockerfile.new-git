@@ -1,0 +1,24 @@
+FROM alpine:latest
+
+ARG http_proxy=http://proxy-chain.intel.com:911
+ARG https_proxy=http://proxy-chain.intel.com:911
+
+RUN \
+    apk update && apk add \
+    	    bash \
+	    curl \
+	    git \
+	    openssh \
+	    tar \
+	    gzip \
+	    make \
+	    g++ \
+	    ca-certificates
+
+RUN git clone https://github.com/ingydotnet/git-subrepo /usr/src/git-subrepo
+
+COPY .bashrc /root/.bashrc
+
+RUN cat /etc/passwd | sed 's^/ash^/bash^g' > passwd && cp passwd /etc/passwd
+
+CMD bash

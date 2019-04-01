@@ -78,7 +78,7 @@ jobs:
             - test-reports
             - coverage-reports
 
-  check_results:
+  store_results:
     executor: other-executor
     parameters:
       dir:
@@ -87,7 +87,10 @@ jobs:
     steps:
       - attach_workspace:
           # Must be absolute path or relative path from working_directory
-          at: /tmp/workspace
+          at: /work/workspace
+      - run: pwd; ls -l
+      - store_test_results:
+        path: src/<< parameters.dir >>/test-reports
 
 
 workflows:
@@ -116,17 +119,17 @@ workflows:
           dir:  "enumerate"
           dependencies:  tally
           source: "enumerate,tests"
-      - check_results:
+      - store_results:
           requires:
             - tally
           name:  check_tally
           dir:  "tally"
-      - check_results:
+      - store_results:
           requires:
             - sgi
           name:  check_sgi
           dir:  "sgi"
-      - check_results:
+      - store_results:
           requires:
             - enumerate
           name:  check_enumerate
