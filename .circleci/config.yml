@@ -64,7 +64,8 @@ jobs:
       - run: coverage xml
       - run: coverage-badge -o htmlcov/coverage.svg
       - run: mkdir -p test-reports && cp junit.xml test-reports
-      - run: mkdir -p coverage-reports && cp -r coverage.xml htmlcov coverage-reports 
+      - run: mkdir -p coverage-reports && cp -r coverage.xml htmlcov coverage-reports
+      - run: pwd; ls -l
             
       # Persist the specified paths (workspace/echo-output) into the workspace for
       # use in downstream job.
