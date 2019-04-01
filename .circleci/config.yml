@@ -90,11 +90,11 @@ jobs:
           at: /work/workspace
       - run: pwd; ls -l
       - store_test_results:
-          path: src/<< parameters.dir >>/test-reports
+          path: /work/workspace/src/<< parameters.dir >>/test-reports
       - store_artifacts:
-          path: src/<< parameters.dir >>/test-reports
+          path: /work/workspace/src/<< parameters.dir >>/test-reports
       - store_artifacts:
-          path: src/<< parameters.dir >>/coverage-reports
+          path: /work/workspace/src/<< parameters.dir >>/coverage-reports
 
 
 workflows:
@@ -126,15 +126,15 @@ workflows:
       - store_results:
           requires:
             - tally
-          name:  check_tally
+          name:  store_tally
           dir:  "tally"
       - store_results:
           requires:
             - sgi
-          name:  check_sgi
+          name:  store_sgi
           dir:  "sgi"
       - store_results:
           requires:
             - enumerate
-          name:  check_enumerate
+          name:  store_enumerate
           dir:  "enumerate"
